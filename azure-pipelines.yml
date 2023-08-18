@@ -5,14 +5,5 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: docker build -t jmeter-image:$(Build.BuildId) .
+- script: docker build -t basic-docker-image:$(Build.BuildId) .
   displayName: 'Build Docker Image'
-
-- script: echo $(System.AccessToken) | docker login --username $(dockerUsername) --password-stdin
-  displayName: 'Docker Login'
-
-- script: docker run -v $(Pipeline.Workspace):/mnt/jmeter -w /mnt/jmeter jmeter-image:$(Build.BuildId) -n -t CSVSample.jmx -l test-results.jtl
-  displayName: 'Run JMeter Test'
-
-- script: docker stop $(docker ps -a -q --filter ancestor=jmeter-image:$(Build.BuildId))
-  displayName: 'Stop Docker Container'
