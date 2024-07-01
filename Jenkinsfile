@@ -1,33 +1,28 @@
 pipeline {
     agent any
-
+    
+    triggers {
+        githubPush()
+    }
+    
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/vasanthshanmugam/jmeter_test' // Replace with your repository URL
+                checkout scm
             }
         }
-
-        stage('Run JMeter Test') {
+        
+        stage('Run JMeter Tests') {
             steps {
-                script {
-                    def jmeterHome = tool name: 'JMeter', type: 'JMeterInstallation'
-                    sh "${jmeterHome}/bin/jmeter -n -t IfController_Demo.jmx -l results.jtl"
-                }
+                bat """
+                "C:\\Vasanth\\apache-jmeter-5.6.3\\bin\\jmeter.bat" -n -t "IfController_Demo.jmx" -l results.jtl
+                """
             }
         }
-
-        stage('Publish Results') {
+        
+        stage('Publish JMeter Report') {
             steps {
-                perfReport sourceDataFiles: 'results.jtl'
-            }
-        }
-
-        stage('Email Notification') {
-            steps {
-                mail to: 'vasanthtce@gmail.com',
-                     subject: "Performance Test Results",
-                     body: "The performance tests have completed. Please check the Jenkins job for detailed results."
+                perfReport filterRegex: '', sourceDataFiles: '**/*.jtl'
             }
         }
     }
